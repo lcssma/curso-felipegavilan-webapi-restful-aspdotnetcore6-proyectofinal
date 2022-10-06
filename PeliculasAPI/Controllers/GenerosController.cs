@@ -8,13 +8,14 @@ namespace PeliculasAPI.Controllers
 {
     [ApiController]
     [Route("api/generos")]
-    public class GenerosController: ControllerBase
+    public class GenerosController: CustomBaseController
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
 
         public GenerosController(ApplicationDbContext context,
             IMapper mapper)
+            :base(context, mapper)
         {
             this.context = context;
             this.mapper = mapper;
@@ -23,23 +24,13 @@ namespace PeliculasAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<List<GeneroDTO>>> Get()
         {
-            var entidades = await context.Generos.ToListAsync();
-            var dtos = mapper.Map<List<GeneroDTO>>(entidades);
-            return dtos;
+            return await Get<Genero, GeneroDTO>();
         }
 
         [HttpGet("{id:int}", Name = "obtenerGenero")]
         public async Task<ActionResult<GeneroDTO>> Get(int id)
         {
-            var entidad = await context.Generos.FirstOrDefaultAsync(x => x.Id == id);
-            
-            if(entidad == null)
-            {
-                return NotFound();
-            }
-
-            var dto = mapper.Map<GeneroDTO>(entidad);
-            return dto;
+            return await Get<Genero, GeneroDTO>(id);
         }
 
         [HttpPost]
